@@ -1,99 +1,37 @@
-function toTitleCase(str) {
-  const titleCase = str
-    .split(" ")
-    .map((word) => {
-      return word.charAt(0).toUpperCase() + word.slice(1);
+const destination = document.getElementById("typedtext");
+let quote = "";
+
+function loadQuote() {
+  return fetch("https://api.quotable.io/random")
+    .then((response) => {
+      if (!response.ok) throw new Error(response.status);
+      return response.json();
     })
-    .join(" ");
-  return titleCase;
+    .then((data) => data.content);
 }
-console.log(toTitleCase("my name is taras"));
 
-truncate = function (str, length, ending) {
-  if (length == null) {
-    length = 100;
+async function typeWriter() {
+  while (true) {
+    quote = await loadQuote();
+    for (let i = 0; i <= quote.length; i++) {
+      destination.innerHTML = quote.substring(0, i) + "<span>\u25AE<span>";
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    destination.innerHTML = "";
+    await new Promise((resolve) => setTimeout(resolve, 3000));
   }
-  if (ending == null) {
-    ending = "...";
-  }
-  if (str.length > length) {
-    return str.substring(0, length - ending.length) + ending;
-  } else {
-    return str;
-  }
-};
-console.log(truncate("Lorem ipsum dolor sit amet, consectetur.", 14));
-console.log(truncate("Lorem ipsum dolor sit amet, consectetur.", 255));
+}
 
-const filterRange = (arr, from, to) => {
-  return arr.filter((item) => item >= from && item <= to);
-};
+typeWriter();
 
-const numArr = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-console.log(filterRange(numArr, 3, 7));
+const lightThemeBtn = document.getElementById("light-theme-btn");
+const darkThemeBtn = document.getElementById("dark-theme-btn");
+const body = document.body;
 
-const sortArr = (arr) => arr.sort((a, b) => a - b);
-const arrToSort = [324, 32423, -3242, 544, 0, 23, -454, 22, 4];
-sortArr(arrToSort);
-console.log(sortArr(arrToSort));
+function toggleTheme() {
+  body.classList.toggle("dark-theme");
+}
 
-const sortStringArr = (arr) => arr.sort((a, b) => a.length - b.length);
-const stringArr = ["4534", "a", "bb", "sdfds", "", " ", "r4rdv-"];
-console.log(sortStringArr(stringArr));
+lightThemeBtn.addEventListener("click", toggleTheme);
+darkThemeBtn.addEventListener("click", toggleTheme);
 
-const usersArr = [
-  { name: "John", age: 25 },
-  { name: "John", age: 5 },
-  { name: "John", age: 2 },
-  { name: "John", age: 45 },
-  { name: "Pete", age: 30 },
-  { name: "Mary", age: 29 },
-  { name: "Mary", age: 2 },
-  { name: "Taras", age: 25 },
-  { name: "Taras", age: 19 },
-  { name: "Kate", age: 74 },
-  { name: "Chris", age: 14 },
-  { name: "Alan", age: 5 },
-  { name: "Alan", age: 32 },
-  { name: "Boris", age: 55 },
-  { name: "Elizabeth", age: 48 },
-  { name: "Elizabeth", age: 8 },
-];
-
-const sortAge = (arr) => {
-  const filteredArr = arr.filter((item) => item.age > 17 && item.age < 55);
-  const sum = filteredArr.reduce((acc, item) => (acc += item.age), 0);
-
-  return sum / filteredArr.length;
-};
-console.log(sortAge(usersArr));
-
-const sortUsers = (arr) => {
-  return arr.sort((a, b) => {
-    const textA = a.name.toUpperCase();
-    const textB = b.name.toUpperCase();
-    return textA < textB ? -1 : textA > textB ? 1 : a.age - b.age;
-  });
-};
-console.log(sortUsers(usersArr));
-
-const strings = [
-  "Привіт",
-  "Світ",
-  "Привіт",
-  "Світ",
-  "Привіт",
-  "Привіт",
-  "Світ",
-  "Світ",
-  ":-O",
-];
-
-const unique = (arr) => {
-  const uniqueArr = [];
-  strings.forEach((str) => !u.includes(item) && u.push(item));
-
-  return uniqueArr;
-};
-
-console.log(unique(strings));
