@@ -1,115 +1,114 @@
-const university = {
-  universityName: "Polytechnic",
-  dean: "John Smith",
-};
-
-const faculty = Object.create(university, {
-  facultyName: {
-    value: "Computer Science",
-  },
-  groups: {
-    value: [[]],
-  },
-  enlistStudent: {
-    value: function(name) {
-      const groups = this.groups;
-      let lastGroup = groups[groups.length - 1];
-      if (lastGroup.length >= 12) {
-        lastGroup = [];
-        groups.push(lastGroup);
-      }
-      lastGroup.push(name);
-    },
-  },
-});
-
-console.log(faculty.universityName);
-faculty.enlistStudent("Taras");
-console.log(faculty.groups);
-////////////////////////////////////////////////
-class Shape {
-  constructor(color) {
-    this.color = color;
+class Vehicle {
+  constructor(power, gasTank, mass) {
+    this.power = power;
+    this.gasTank = gasTank;
+    this.mass = mass;
+    this.started = false;
   }
 
-  getArea() {
-    return 0;
-  }
-}
-
-class Rectangle extends Shape {
-  constructor(color, width, height) {
-    super(color);
-    this.width = width;
-    this.height = height;
+  getMaxSpeed() {
+    return Math.round(0.84 * this.power / this.mass);
   }
 
-  getArea() {
-    return this.width * this.height;
-  }
-}
-
-class Circle extends Shape {
-  constructor(color, radius) {
-    super(color);
-    this.radius = radius;
+  getGasUsage() {
+    return Math.round(this.getMaxSpeed() / this.power * 100);
   }
 
-  getArea() {
-    return Math.PI * this.radius ** 2;
-  }
-}
-const shape = new Shape('red');
-console.log(shape.color);
-console.log(shape.getArea());
-
-const rectangle = new Rectangle('green', 5, 10);
-console.log(rectangle.color);
-console.log(rectangle.width);
-console.log(rectangle.height);
-console.log(rectangle.getArea());
-
-const circle = new Circle('blue', 3);
-console.log(circle.color);
-console.log(circle.radius);
-console.log(circle.getArea());
-///////////////////////////////////////////////////////
-const fibonacci = (n) => {
-  let a = 0, b = 1;
-
-  for (let i = 0; i < n; i++) {
-    const temp = a + b;
-    a = b;
-    b = temp;
+  startEngine() {
+    this.started = true;
   }
 
-  return a;
-};
-console.log(fibonacci(7));
-////////////////////////////////////////////////////
-const cacheDecorator = (func) => {
-  const cache = {};
-  return (...args) => {
-    const key = JSON.stringify(args);
-    if (cache[key]) {
-      return cache[key];
+  stopEngine() {
+    this.started = false;
+  }
+
+  drive(speed, distance) {
+    if (!this.started) {
+      console.log("Engine is not started.");
+      return;
     }
-    const result = func(...args);
-    cache[key] = result;
-    return result;
-  };
-};
-const fibonacci = (n, cache = {}) => {
-  if (n < 2) {
-    return n;
+
+    const maxSpeed = this.getMaxSpeed();
+    if (speed > maxSpeed) {
+      console.log(`Cannot drive faster than ${maxSpeed} km/h.`);
+      return;
+    }
+    if (speed < 0) {
+      console.log(`Speed cannot be negative.`);
+      return;
+    }
+
+    const gasUsage = this.getGasUsage();
+    const gasLevel = distance * gasUsage / 100;
+    if (gasLevel > this.gasTank) {
+      console.log(`Not enough gas. Maximum distance you can drive is ${this.gasTank / gasUsage} km.`);
+      return;
+    }
+
+    this.gasTank -= gasLevel;
+    console.log(`Successfully drove ${distance} km.`);
   }
-  const key = JSON.stringify(n);
-  if (cache[key]) {
-    return cache[key];
+
+  addGas(amount) {
+    if (amount <= 0) {
+      console.log("Amount must be bigger than zero.");
+      return;
+    }
+    if (this.gasTank + amount > this.constructor.maxGasTank) {
+      console.log(`Cannot pour more than ${this.constructor.maxGasTank} liters of gas.`);
+      return;
+    }
+
+    this.gasTank += amount;
+    console.log(`Successfully added ${amount} liters of gas.`);
   }
-  const result = fibonacci(n - 1, cache) + fibonacci(n - 2, cache);
-  cache[key] = result;
-  return result;
-};
-const decoratedFib = cacheDecorator(fibonacci);
-decoratedFib(7);
+
+  printInfo() {
+    console.log(`Type: ${this.constructor.name}`);
+    console.log(`Power: ${this.power} kW`);
+    console.log(`Gas tank: ${this.gasTank} liters`);
+    console.log(`Mass: ${this.mass} tonnes`);
+    console.log(`Max speed: ${this.getMaxSpeed()} km/h`);
+    console.log(`Gas usage per km: ${this.getGasUsage()} liters`);
+    console.log(`Started: ${this.started}`);
+    console.log(`Current gas level: ${this.gasTank} liters`);
+  }
+}
+
+class Car extends Vehicle {
+  constructor(power, gasTank, mass, type, maxPassengerCount) {
+    super(power, gasTank, mass);
+    this.type = type;
+    this.maxPassengerCount = maxPassengerCount;
+    this.passengerCount = 0;
+  }
+
+  printInfo() {
+    super.printInfo();
+    console.log(`Type: ${this.type}`);
+    console.log(`Max passenger count: ${this.maxPassengerCount}`);
+    console.log(`Passenger count: ${this.passengerCount}`);
+  }
+}
+
+class Bus extends Car {
+  constructor(power, gasTank, mass, type, maxPassengerCount) {
+    super(power, gasTank, mass, type, maxPassengerCount);
+  }
+
+  updatePassengers(passengers) {
+    if (passengers > this.maxPassengerCount) {
+      console.log(`Cannot have more than ${this.maxPassengerCount} passengers.`);
+      return;
+    }
+    if (passengers < 0) {
+      console.log(`Passenger count cannot be negative.`);
+      return;
+    }
+
+    this.passengerCount = passengers;
+    console.log(`Updated passenger count to ${passengers}.`);
+  }
+
+  printInfo() {
+    super.printInfo();
