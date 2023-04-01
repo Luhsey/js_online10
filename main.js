@@ -1,84 +1,37 @@
-const calculate = (initialNumber) => {
-  let currentResult = initialNumber;
+const list = document.getElementById("list");
+let prevSelectedIndex = -1;
 
-  const add = (num) => {
-    currentResult += num;
-    return currentResult;
-  };
-
-  const subtract = (num) => {
-    currentResult -= num;
-    return currentResult;
-  };
-
-  const multiply = (num) => {
-    currentResult *= num;
-    return currentResult;
-  };
-
-  const divide = (num) => {
-    currentResult /= num;
-    return currentResult;
-  };
-
-  const reset = () => {
-    currentResult = initialNumber;
-    return currentResult;
-  };
-
-  return { add, subtract, multiply, divide, reset };
-};
-const calculator = calculate(5);
-console.log(calculator.add(5));
-console.log(calculator.subtract(2));
-console.log(calculator.multiply(3));
-console.log(calculator.divide(4));
-console.log(calculator.reset());
-/////////////////////////////////////////////////////////
-const cacheDecorator = (func) => {
-  const cache = {};
-
-  return function (...args) {
-    const key = JSON.stringify(args);
-
-    if (key in cache) {
-      console.log("Returning result from cache for key:", key);
-      return cache[key];
+list.addEventListener("click", (event) => {
+  const target = event.target;
+  const selectedIndex = Array.from(target.parentNode.children).indexOf(target);
+  
+  if (selectedIndex === -1) return; 
+  
+  if (event.ctrlKey || event.metaKey) {
+    target.classList.toggle("highlight");
+  } else if (event.shiftKey) {
+    if (prevSelectedIndex === -1) {
+      list.firstChild.classList.add("highlight");
+      prevSelectedIndex = 0;
     }
-
-    const result = func.apply(this, args);
-    cache[key] = result;
-    console.log("Caching result for key:", key);
-
-    return result;
-  };
-};
-const sum = (num) => {
-  return num + num;
-};
-
-const decoratedSum = cacheDecorator(sum);
-console.log(decoratedSum(2));
-console.log(decoratedSum(2));
-
-const obj = {
-  num: 1,
-  result: null,
-  sum(num) {
-    return this.num + num;
-  },
-};
-
-const decoratedObjSum = cacheDecorator(obj.sum.bind(obj));
-console.log(decoratedObjSum(3));
-console.log(decoratedObjSum(3));
-////////////////////////////////////////////////////////
-const factorial = (initialNumber) => {
-  if (initialNumber === 0) {
-    return 1;
+    const startIndex = Math.min(selectedIndex, prevSelectedIndex);
+    const endIndex = Math.max(selectedIndex, prevSelectedIndex);
+    for (let i = startIndex; i <= endIndex; i++) {
+      list.children[i].classList.add("highlight");
+    }
   } else {
-    return initialNumber * factorial(initialNumber - 1);
+    for (const li of list.children) {
+      li.classList.remove("highlight");
+    }
+    target.classList.add("highlight");
   }
-};
-
-console.log(factorial(5));
+  
+  prevSelectedIndex = selectedIndex;
+});
+document.addEventListener("click", (event) => {
+  const dot = document.createElement("div");
+  dot.classList.add("dot");
+  dot.style.top = `${event.clientY}px`;
+  dot.style.left = `${event.clientX}px`;
+  document.body.appendChild(dot);
+});
