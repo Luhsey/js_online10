@@ -1,99 +1,115 @@
-function toTitleCase(str) {
-  const titleCase = str
-    .split(" ")
-    .map((word) => {
-      return word.charAt(0).toUpperCase() + word.slice(1);
-    })
-    .join(" ");
-  return titleCase;
+const university = {
+  universityName: "Polytechnic",
+  dean: "John Smith",
+};
+
+const faculty = Object.create(university, {
+  facultyName: {
+    value: "Computer Science",
+  },
+  groups: {
+    value: [[]],
+  },
+  enlistStudent: {
+    value: function(name) {
+      const groups = this.groups;
+      let lastGroup = groups[groups.length - 1];
+      if (lastGroup.length >= 12) {
+        lastGroup = [];
+        groups.push(lastGroup);
+      }
+      lastGroup.push(name);
+    },
+  },
+});
+
+console.log(faculty.universityName);
+faculty.enlistStudent("Taras");
+console.log(faculty.groups);
+////////////////////////////////////////////////
+class Shape {
+  constructor(color) {
+    this.color = color;
+  }
+
+  getArea() {
+    return 0;
+  }
 }
-console.log(toTitleCase("my name is taras"));
 
-truncate = function (str, length, ending) {
-  if (length == null) {
-    length = 100;
+class Rectangle extends Shape {
+  constructor(color, width, height) {
+    super(color);
+    this.width = width;
+    this.height = height;
   }
-  if (ending == null) {
-    ending = "...";
+
+  getArea() {
+    return this.width * this.height;
   }
-  if (str.length > length) {
-    return str.substring(0, length - ending.length) + ending;
-  } else {
-    return str;
+}
+
+class Circle extends Shape {
+  constructor(color, radius) {
+    super(color);
+    this.radius = radius;
   }
+
+  getArea() {
+    return Math.PI * this.radius ** 2;
+  }
+}
+const shape = new Shape('red');
+console.log(shape.color);
+console.log(shape.getArea());
+
+const rectangle = new Rectangle('green', 5, 10);
+console.log(rectangle.color);
+console.log(rectangle.width);
+console.log(rectangle.height);
+console.log(rectangle.getArea());
+
+const circle = new Circle('blue', 3);
+console.log(circle.color);
+console.log(circle.radius);
+console.log(circle.getArea());
+///////////////////////////////////////////////////////
+const fibonacci = (n) => {
+  let a = 0, b = 1;
+
+  for (let i = 0; i < n; i++) {
+    const temp = a + b;
+    a = b;
+    b = temp;
+  }
+
+  return a;
 };
-console.log(truncate("Lorem ipsum dolor sit amet, consectetur.", 14));
-console.log(truncate("Lorem ipsum dolor sit amet, consectetur.", 255));
-
-const filterRange = (arr, from, to) => {
-  return arr.filter((item) => item >= from && item <= to);
+console.log(fibonacci(7));
+////////////////////////////////////////////////////
+const cacheDecorator = (func) => {
+  const cache = {};
+  return (...args) => {
+    const key = JSON.stringify(args);
+    if (cache[key]) {
+      return cache[key];
+    }
+    const result = func(...args);
+    cache[key] = result;
+    return result;
+  };
 };
-
-const numArr = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-console.log(filterRange(numArr, 3, 7));
-
-const sortArr = (arr) => arr.sort((a, b) => a - b);
-const arrToSort = [324, 32423, -3242, 544, 0, 23, -454, 22, 4];
-sortArr(arrToSort);
-console.log(sortArr(arrToSort));
-
-const sortStringArr = (arr) => arr.sort((a, b) => a.length - b.length);
-const stringArr = ["4534", "a", "bb", "sdfds", "", " ", "r4rdv-"];
-console.log(sortStringArr(stringArr));
-
-const usersArr = [
-  { name: "John", age: 25 },
-  { name: "John", age: 5 },
-  { name: "John", age: 2 },
-  { name: "John", age: 45 },
-  { name: "Pete", age: 30 },
-  { name: "Mary", age: 29 },
-  { name: "Mary", age: 2 },
-  { name: "Taras", age: 25 },
-  { name: "Taras", age: 19 },
-  { name: "Kate", age: 74 },
-  { name: "Chris", age: 14 },
-  { name: "Alan", age: 5 },
-  { name: "Alan", age: 32 },
-  { name: "Boris", age: 55 },
-  { name: "Elizabeth", age: 48 },
-  { name: "Elizabeth", age: 8 },
-];
-
-const sortAge = (arr) => {
-  const filteredArr = arr.filter((item) => item.age > 17 && item.age < 55);
-  const sum = filteredArr.reduce((acc, item) => (acc += item.age), 0);
-
-  return sum / filteredArr.length;
+const fibonacci = (n, cache = {}) => {
+  if (n < 2) {
+    return n;
+  }
+  const key = JSON.stringify(n);
+  if (cache[key]) {
+    return cache[key];
+  }
+  const result = fibonacci(n - 1, cache) + fibonacci(n - 2, cache);
+  cache[key] = result;
+  return result;
 };
-console.log(sortAge(usersArr));
-
-const sortUsers = (arr) => {
-  return arr.sort((a, b) => {
-    const textA = a.name.toUpperCase();
-    const textB = b.name.toUpperCase();
-    return textA < textB ? -1 : textA > textB ? 1 : a.age - b.age;
-  });
-};
-console.log(sortUsers(usersArr));
-
-const strings = [
-  "Привіт",
-  "Світ",
-  "Привіт",
-  "Світ",
-  "Привіт",
-  "Привіт",
-  "Світ",
-  "Світ",
-  ":-O",
-];
-
-const unique = (arr) => {
-  const uniqueArr = [];
-  strings.forEach((str) => !u.includes(item) && u.push(item));
-
-  return uniqueArr;
-};
-
-console.log(unique(strings));
+const decoratedFib = cacheDecorator(fibonacci);
+decoratedFib(7);
