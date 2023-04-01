@@ -1,37 +1,40 @@
 const list = document.getElementById("list");
-let prevSelectedIndex = -1;
+const items = list.getElementsByTagName("li");
+
+let prevSelected = null;
+let startSelected = null;
 
 list.addEventListener("click", (event) => {
-  const target = event.target;
-  const selectedIndex = Array.from(target.parentNode.children).indexOf(target);
-  
-  if (selectedIndex === -1) return; 
-  
-  if (event.ctrlKey || event.metaKey) {
-    target.classList.toggle("highlight");
+  const clickedItem = event.target;
+  if (clickedItem.tagName !== "LI") return;
+
+  if (event.ctrlKey) {
+    clickedItem.classList.toggle("selected");
+    if (prevSelected) prevSelected.classList.toggle("selected");
+    prevSelected = clickedItem;
   } else if (event.shiftKey) {
-    if (prevSelectedIndex === -1) {
-      list.firstChild.classList.add("highlight");
-      prevSelectedIndex = 0;
-    }
-    const startIndex = Math.min(selectedIndex, prevSelectedIndex);
-    const endIndex = Math.max(selectedIndex, prevSelectedIndex);
-    for (let i = startIndex; i <= endIndex; i++) {
-      list.children[i].classList.add("highlight");
+    if (!startSelected) startSelected = clickedItem;
+    const startIndex = Array.prototype.indexOf.call(items, startSelected);
+    const endIndex = Array.prototype.indexOf.call(items, clickedItem);
+    const [min, max] = [startIndex, endIndex].sort();
+    for (let i = min; i <= max; i++) {
+      items[i].classList.add("selected");
     }
   } else {
-    for (const li of list.children) {
-      li.classList.remove("highlight");
+    clickedItem.classList.add("selected");
+    if (prevSelected && prevSelected !== clickedItem) {
+      prevSelected.classList.remove("selected");
     }
-    target.classList.add("highlight");
+    prevSelected = clickedItem;
+    startSelected = clickedItem;
   }
-  
-  prevSelectedIndex = selectedIndex;
 });
-document.addEventListener("click", (event) => {
+const container = document.getElementById("container");
+container.addEventListener("click", (event) => {
   const dot = document.createElement("div");
   dot.classList.add("dot");
-  dot.style.top = `${event.clientY}px`;
-  dot.style.left = `${event.clientX}px`;
-  document.body.appendChild(dot);
+  dot.style.left = `${event.pageX - 5}px`;
+  dot.style.top = `${event.pageY - 5}px`;
+  container.appendChild(dot);
 });
+
