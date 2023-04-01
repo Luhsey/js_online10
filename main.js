@@ -1,146 +1,84 @@
-const unique = (arr) => {
-  const map = new Map();
-  for (const word of arr) {
-    const sorted = word.split('').sort().join('');
-    if (!map.has(sorted)) {
-      map.set(sorted, word);
-    }
-  }
-  return Array.from(map.values());
+const calculate = (initialNumber) => {
+  let currentResult = initialNumber;
+
+  const add = (num) => {
+    currentResult += num;
+    return currentResult;
+  };
+
+  const subtract = (num) => {
+    currentResult -= num;
+    return currentResult;
+  };
+
+  const multiply = (num) => {
+    currentResult *= num;
+    return currentResult;
+  };
+
+  const divide = (num) => {
+    currentResult /= num;
+    return currentResult;
+  };
+
+  const reset = () => {
+    currentResult = initialNumber;
+    return currentResult;
+  };
+
+  return { add, subtract, multiply, divide, reset };
 };
-const anagrams = [
-  "actor",
-  "carot",
-  "listen",
-  "enlist",
-  "debit",
-  "bidet",
-  "tear",
-  "rate",
-  "night",
-  "thing",
-  "lives",
-  "veils",
-  "stressed",
-  "desserts",
-  "dormitory",
-  "dirty room",
-  "rescue",
-  "secure",
-  "a gentleman",
-  "elegant man",
-  "listen",
-  "heart",
-  "angel",
-  "leader",
-];
-console.log(unique(anagrams));
-//////////////////////////////////////
-const user = {
-  firstName: "",
-  lastName: "",
-  age: "",
-  get userInfo() {
-    return `${this.firstName} ${this.lastName} is ${this.age}`;
-  },
-  set userInfo(info) {
-    if (typeof info === "string") {
-      const [firstName, lastName, age] = info.split(" ");
-      this.firstName = firstName;
-      this.lastName = lastName;
-      this.age = age;
-    } else if (typeof info === "object") {
-      const { firstName, lastName, age } = info;
-      this.firstName = firstName;
-      this.lastName = lastName;
-      this.age = age;
+const calculator = calculate(5);
+console.log(calculator.add(5));
+console.log(calculator.subtract(2));
+console.log(calculator.multiply(3));
+console.log(calculator.divide(4));
+console.log(calculator.reset());
+/////////////////////////////////////////////////////////
+const cacheDecorator = (func) => {
+  const cache = {};
+
+  return function (...args) {
+    const key = JSON.stringify(args);
+
+    if (key in cache) {
+      console.log("Returning result from cache for key:", key);
+      return cache[key];
     }
-  },
+
+    const result = func.apply(this, args);
+    cache[key] = result;
+    console.log("Caching result for key:", key);
+
+    return result;
+  };
 };
-user.userInfo = "Taras Samoilenko 25";
-console.log(user.userInfo);
-user.userInfo = { firstName: "Kate", lastName: "Karp", age: 22 };
-console.log(user.userInfo); 
-/////////////////////////////////////////////
+const sum = (num) => {
+  return num + num;
+};
+
+const decoratedSum = cacheDecorator(sum);
+console.log(decoratedSum(2));
+console.log(decoratedSum(2));
+
 const obj = {
-  from: 1,
-  to: 10,
-  createArr() {
-    this.arr = [];
-    for (let i = this.from; i <= this.to; i++) {
-      this.arr.push(i);
-    }
-    return this.arr;
+  num: 1,
+  result: null,
+  sum(num) {
+    return this.num + num;
   },
 };
-obj.createArr();
-console.log(obj.arr);
-///////////////////////////////////////////////
-function Car(model, color, age, speed, gasTank, started) {
-  this.model = model;
-  this.color = color;
-  this.age = age;
-  this.speed = speed;
-  this.gasTank = gasTank;
-  this.started = started;
 
-  this.startEngine = function() {
-    if (this.gasTank > 0) {
-      this.started = true;
-    }
-    return this;
-  };
+const decoratedObjSum = cacheDecorator(obj.sum.bind(obj));
+console.log(decoratedObjSum(3));
+console.log(decoratedObjSum(3));
+////////////////////////////////////////////////////////
+const factorial = (initialNumber) => {
+  if (initialNumber === 0) {
+    return 1;
+  } else {
+    return initialNumber * factorial(initialNumber - 1);
+  }
+};
 
-  this.drive = function() {
-    if (this.started && this.gasTank > 0) {
-      this.speed = 30;
-    }
-    return this;
-  };
-
-  this.stop = function() {
-    this.started = false;
-    this.speed = 0;
-    return this;
-  };
-
-  this.speedUp = function(amount) {
-    if (this.started && this.gasTank > 0) {
-      this.speed += amount;
-      if (this.speed > 200) {
-        this.speed = 200;
-      }
-      this.gasTank -= 5;
-      if (this.gasTank < 0) {
-        this.gasTank = 0;
-        this.stop();
-      }
-    }
-    return this;
-  };
-
-  this.slowDown = function(amount) {
-    if (this.started && this.gasTank > 0) {
-      this.speed -= amount;
-      if (this.speed < 0) {
-        this.speed = 0;
-      }
-      this.gasTank -= 5;
-      if (this.gasTank < 0) {
-        this.gasTank = 0;
-        this.stop();
-      }
-    }
-    return this;
-  };
-
-  this.addGas = function(amount) {
-    this.gasTank += amount;
-    if (this.gasTank > 20) {
-      this.gasTank = 20;
-    }
-    return this;
-  };
-
-}
-const car = new Car('Toyota', 'red', 5, 0, 10, false);
+console.log(factorial(5));
